@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  apache:
+    build: ./apache
+    container_name: apache_server
+    ports:
+      - "9090:80"  # maps localhost:9090 to container's port 80
+    volumes:
+      - ./apache/index.html:/usr/local/apache2/htdocs/index.html:ro
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
+        fluentd-async: "true"
+
+  fluentd:
+    image: fluent/fluentd:v1.13-debian-1.0
+    container_name: fluentd_log
+    ports:
+      - "24224:24224"  # Expose Fluentd port for log collection
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
